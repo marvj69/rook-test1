@@ -98,22 +98,45 @@
       }
     }
 
-    document.getElementById("create-team-form").onsubmit = async (e) => {
-      e.preventDefault();
-      const teamName = document.getElementById("team-name-input").value.trim();
-      if (!teamName) return;
+  document.getElementById("create-team-form").onsubmit = async (e) => {
+  e.preventDefault();
+  const teamName = document.getElementById("team-name-input").value.trim();
+  if (!teamName) {
+    alert("Please enter a team name");
+    return;
+  }
 
-      // Post new team to Google Sheets
-      await fetch(GAS_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "team", teamName }),
-      });
+  try {
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        type: "team",
+        teamName: teamName
+      })
+    });
 
-      // Refresh team list
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.status === "success") {
+      alert("Team created successfully!");
       document.getElementById("team-name-input").value = "";
-      fetchData();
-    };
+      // Refresh the team list
+      location.reload();
+    } else {
+      alert("Error creating team: " + data.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert("Error creating team. Please try again.");
+  }
+};
 
     // Load data on page load
     window.onload = fetchData;
