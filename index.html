@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="manifest.json">
   <title>Realtor Finance Tracker</title>
+  <link rel="manifest" href="manifest.json">
   <style>
+    /* [Keep your existing CSS here – same as before] */
     :root {
       --primary-color: #2c3e50;
       --secondary-color: #3498db;
@@ -56,7 +57,7 @@
     }
     .card {
       background-color: white;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       border-radius: 5px;
       padding: 20px;
       margin-bottom: 20px;
@@ -109,13 +110,6 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       font-size: 1rem;
-    }
-    select {
-      appearance: none;
-      background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-      background-repeat: no-repeat;
-      background-position-x: calc(100% - 10px);
-      background-position-y: 50%;
     }
     .transactions {
       max-height: 300px;
@@ -172,22 +166,9 @@
     .tab-content.active {
       display: block;
     }
-    .transaction-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border-color);
-    }
     .transaction-actions {
       display: flex;
       gap: 5px;
-    }
-    .action-btn {
-      cursor: pointer;
-      padding: 5px 10px;
-      border-radius: 3px;
-      font-size: 0.8rem;
     }
     .edit-btn {
       background-color: #f39c12;
@@ -241,7 +222,6 @@
     input:checked + .slider:before {
       transform: translateX(26px);
     }
-    /* Utilities */
     .mt-4 {
       margin-top: 1rem;
     }
@@ -254,36 +234,6 @@
       align-items: center;
       margin-bottom: 20px;
     }
-    /* Tag styles */
-    .tag {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      background-color: #eee;
-      margin-right: 5px;
-      font-size: 0.8rem;
-    }
-    .tag.commission {
-      background-color: #a29bfe;
-      color: white;
-    }
-    .tag.referal {
-      background-color: #74b9ff;
-      color: white;
-    }
-    .tag.marketing {
-      background-color: #ff7675;
-      color: white;
-    }
-    .tag.office {
-      background-color: #55efc4;
-      color: black;
-    }
-    .piechart {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
     /* Dark mode */
     body.dark-mode {
       background-color: #1a1a1a;
@@ -291,7 +241,7 @@
     }
     body.dark-mode .card {
       background-color: #2a2a2a;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
     body.dark-mode .card-header {
       border-bottom-color: #3a3a3a;
@@ -320,12 +270,16 @@
     <h1>Realtor Finance Tracker</h1>
     <p>Track your income, expenses, and financial goals</p>
   </header>
+
   <div class="container">
     <div class="settings-container">
       <div>
         <button id="exportBtn" class="btn btn-primary">Export Data</button>
-        <button id="importBtn" class="btn btn-primary">Import Data</button>
+        <button id="importBtn" class="btn btn-primary">Import JSON Data</button>
         <input type="file" id="importFile" class="hidden">
+        <!-- New PDF import button -->
+        <button id="importPdfBtn" class="btn btn-primary">Import PDF Statement</button>
+        <input type="file" id="importPdfFile" class="hidden" accept="application/pdf">
       </div>
       <div>
         <label class="switch">
@@ -374,41 +328,9 @@
         <div id="transactions" class="tab-content active">
           <form id="transactionForm">
             <div class="form-group">
-              <label for="transactionType">Transaction Type</label>
-              <select id="transactionType" required>
-                <option value="">Select Type</option>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </select>
-            </div>
-            <div id="incomeFields" class="hidden">
-              <div class="form-group">
-                <label for="incomeCategory">Income Category</label>
-                <select id="incomeCategory" required>
-                  <option value="">Select Category</option>
-                  <option value="commission">Commission</option>
-                  <option value="referral">Referral Fee</option>
-                  <option value="bonus">Bonus</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-            <div id="expenseFields" class="hidden">
-              <div class="form-group">
-                <label for="expenseCategory">Expense Category</label>
-                <select id="expenseCategory" required>
-                  <option value="">Select Category</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="office">Office Supplies</option>
-                  <option value="travel">Travel</option>
-                  <option value="licenses">Licenses & Dues</option>
-                  <option value="education">Education</option>
-                  <option value="technology">Technology</option>
-                  <option value="utilities">Utilities</option>
-                  <option value="taxes">Taxes</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+              <label for="categoryInput">Category</label>
+              <input list="categoryList" id="categoryInput" placeholder="Enter or select category" required>
+              <datalist id="categoryList"></datalist>
             </div>
             <div class="form-group">
               <label for="amount">Amount ($)</label>
@@ -567,38 +489,9 @@
       <h3>Edit Transaction</h3>
       <form id="editForm">
         <div class="form-group">
-          <label for="editType">Transaction Type</label>
-          <select id="editType" required>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
-        </div>
-        <div id="editIncomeFields">
-          <div class="form-group">
-            <label for="editIncomeCategory">Income Category</label>
-            <select id="editIncomeCategory">
-              <option value="commission">Commission</option>
-              <option value="referral">Referral Fee</option>
-              <option value="bonus">Bonus</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-        </div>
-        <div id="editExpenseFields">
-          <div class="form-group">
-            <label for="editExpenseCategory">Expense Category</label>
-            <select id="editExpenseCategory">
-              <option value="marketing">Marketing</option>
-              <option value="office">Office Supplies</option>
-              <option value="travel">Travel</option>
-              <option value="licenses">Licenses & Dues</option>
-              <option value="education">Education</option>
-              <option value="technology">Technology</option>
-              <option value="utilities">Utilities</option>
-              <option value="taxes">Taxes</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
+          <label for="editCategory">Category</label>
+          <input list="editCategoryList" id="editCategory" placeholder="Enter or select category" required>
+          <datalist id="editCategoryList"></datalist>
         </div>
         <div class="form-group">
           <label for="editAmount">Amount ($)</label>
@@ -620,16 +513,18 @@
     </div>
   </div>
 
-  <!-- Chart.js -->
+  <!-- PDF.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script>
+    // Set up PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+  </script>
+  <!-- Chart.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
   <script>
     // DOM Elements
     const transactionForm = document.getElementById('transactionForm');
-    const transactionType = document.getElementById('transactionType');
-    const incomeFields = document.getElementById('incomeFields');
-    const expenseFields = document.getElementById('expenseFields');
-    const incomeCategory = document.getElementById('incomeCategory');
-    const expenseCategory = document.getElementById('expenseCategory');
+    const categoryInput = document.getElementById('categoryInput');
     const amount = document.getElementById('amount');
     const date = document.getElementById('date');
     const description = document.getElementById('description');
@@ -654,11 +549,7 @@
     const cancelDelete = document.getElementById('cancelDelete');
     const editModal = document.getElementById('editModal');
     const editForm = document.getElementById('editForm');
-    const editType = document.getElementById('editType');
-    const editIncomeFields = document.getElementById('editIncomeFields');
-    const editExpenseFields = document.getElementById('editExpenseFields');
-    const editIncomeCategory = document.getElementById('editIncomeCategory');
-    const editExpenseCategory = document.getElementById('editExpenseCategory');
+    const editCategory = document.getElementById('editCategory');
     const editAmount = document.getElementById('editAmount');
     const editDate = document.getElementById('editDate');
     const editDescription = document.getElementById('editDescription');
@@ -679,6 +570,8 @@
     const exportBtn = document.getElementById('exportBtn');
     const importBtn = document.getElementById('importBtn');
     const importFile = document.getElementById('importFile');
+    const importPdfBtn = document.getElementById('importPdfBtn');
+    const importPdfFile = document.getElementById('importPdfFile');
 
     // Theme toggle
     const darkModeToggle = document.getElementById('darkModeToggle');
@@ -686,10 +579,7 @@
 
     // Global state
     let transactions = [];
-    let goals = {
-      incomeGoal: 0,
-      expenseBudget: 0
-    };
+    let goals = { incomeGoal: 0, expenseBudget: 0 };
     let currentTransactionId = null;
 
     // Chart variables
@@ -698,7 +588,7 @@
     // Initialize date input with today's date
     date.valueAsDate = new Date();
 
-    // Set start and end date for current month
+    // Set default start and end dates for custom range
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -711,25 +601,37 @@
     }
 
     function formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      const d = new Date(dateString);
+      return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
     function generateId() {
       return Date.now().toString(36) + Math.random().toString(36).substring(2);
     }
 
-    function getTagClass(category) {
-      const tagMap = {
-        'commission': 'commission',
-        'referral': 'referal',
-        'marketing': 'marketing',
-        'office': 'office'
-      };
-      return tagMap[category] || '';
+    // Update datalists for categories
+    function updateCategoryList() {
+      const datalist = document.getElementById('categoryList');
+      const editDatalist = document.getElementById('editCategoryList');
+      datalist.innerHTML = '';
+      editDatalist.innerHTML = '';
+      const categories = new Set();
+      transactions.forEach(tx => {
+        if (tx.category) {
+          categories.add(tx.category);
+        }
+      });
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        datalist.appendChild(option);
+        const option2 = document.createElement('option');
+        option2.value = cat;
+        editDatalist.appendChild(option2);
+      });
     }
 
-    // Save and load from localStorage
+    // Save/load to/from localStorage
     function saveTransactions() {
       localStorage.setItem('transactions', JSON.stringify(transactions));
       localStorage.setItem('goals', JSON.stringify(goals));
@@ -738,27 +640,22 @@
     function loadTransactions() {
       const storedTransactions = localStorage.getItem('transactions');
       const storedGoals = localStorage.getItem('goals');
-      if (storedTransactions) {
-        transactions = JSON.parse(storedTransactions);
-      }
-      if (storedGoals) {
-        goals = JSON.parse(storedGoals);
-      }
+      if (storedTransactions) transactions = JSON.parse(storedTransactions);
+      if (storedGoals) goals = JSON.parse(storedGoals);
     }
 
-    // Render transactions list
+    // Render transactions in table
     function renderTransactions() {
       transactionsList.innerHTML = '';
       transactions.forEach(tx => {
         const tr = document.createElement('tr');
         const txDate = formatDate(tx.date);
         const amountFormatted = formatCurrency(tx.amount);
-        const categoryTag = `<span class="tag ${getTagClass(tx.category)}">${tx.category}</span>`;
         tr.innerHTML = `
           <td>${txDate}</td>
           <td>${tx.description}</td>
-          <td>${categoryTag}</td>
-          <td class="${tx.type === 'income' ? 'income' : 'expense'}">${amountFormatted}</td>
+          <td>${tx.category}</td>
+          <td class="${tx.amount >= 0 ? 'income' : 'expense'}">${amountFormatted}</td>
           <td>
             <div class="transaction-actions">
               <button class="btn edit-btn" data-id="${tx.id}">Edit</button>
@@ -769,28 +666,19 @@
         transactionsList.appendChild(tr);
       });
 
-      // Attach delete and edit event listeners
+      // Attach event listeners for delete and edit buttons
       document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function() {
           currentTransactionId = this.getAttribute('data-id');
           deleteModal.style.display = 'flex';
         });
       });
       document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function() {
           currentTransactionId = this.getAttribute('data-id');
           const tx = transactions.find(t => t.id === currentTransactionId);
           if (tx) {
-            editType.value = tx.type;
-            if (tx.type === 'income') {
-              editIncomeFields.style.display = 'block';
-              editExpenseFields.style.display = 'none';
-              editIncomeCategory.value = tx.category;
-            } else {
-              editIncomeFields.style.display = 'none';
-              editExpenseFields.style.display = 'block';
-              editExpenseCategory.value = tx.category;
-            }
+            editCategory.value = tx.category;
             editAmount.value = tx.amount;
             editDate.value = tx.date;
             editDescription.value = tx.description;
@@ -800,20 +688,16 @@
       });
     }
 
-    // Update summary cards for current month
+    // Update summary cards (income: positive, expense: negative amounts)
     function updateSummary() {
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
-      let incomeTotal = 0;
-      let expenseTotal = 0;
+      let incomeTotal = 0, expenseTotal = 0;
       transactions.forEach(tx => {
-        const txDate = new Date(tx.date);
-        if (txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear) {
-          if (tx.type === 'income') {
-            incomeTotal += tx.amount;
-          } else if (tx.type === 'expense') {
-            expenseTotal += tx.amount;
-          }
+        const d = new Date(tx.date);
+        if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+          if (tx.amount >= 0) incomeTotal += tx.amount;
+          else expenseTotal += Math.abs(tx.amount);
         }
       });
       totalIncome.textContent = formatCurrency(incomeTotal);
@@ -821,37 +705,21 @@
       netIncome.textContent = formatCurrency(incomeTotal - expenseTotal);
     }
 
-    // Update goals and budget progress
-    function updateGoals() {
-      const currentMonthIncome = parseFloat(totalIncome.textContent.replace(/[^0-9.-]+/g, "")) || 0;
-      const incomeGoalValue = parseFloat(goals.incomeGoal) || 0;
-      let incomePercent = incomeGoalValue ? Math.min((currentMonthIncome / incomeGoalValue) * 100, 100) : 0;
-      incomeGoalBar.style.width = incomePercent + '%';
-      incomeGoalText.textContent = `${formatCurrency(currentMonthIncome)} of ${formatCurrency(incomeGoalValue)} (${incomePercent.toFixed(0)}%)`;
-
-      const currentMonthExpenses = parseFloat(totalExpenses.textContent.replace(/[^0-9.-]+/g, "")) || 0;
-      const expenseBudgetValue = parseFloat(goals.expenseBudget) || 0;
-      let expensePercent = expenseBudgetValue ? Math.min((currentMonthExpenses / expenseBudgetValue) * 100, 100) : 0;
-      expenseBudgetBar.style.width = expensePercent + '%';
-      expenseBudgetText.textContent = `${formatCurrency(currentMonthExpenses)} of ${formatCurrency(expenseBudgetValue)} (${expensePercent.toFixed(0)}%)`;
-    }
-
     // Render charts using Chart.js
     function renderCharts() {
-      // Filter transactions for the current month
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
       const filteredTransactions = transactions.filter(tx => {
-        const txDate = new Date(tx.date);
-        return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+        const d = new Date(tx.date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
       });
-      const incomeData = {};
-      const expenseData = {};
+
+      const incomeData = {}, expenseData = {};
       filteredTransactions.forEach(tx => {
-        if (tx.type === 'income') {
+        if (tx.amount >= 0) {
           incomeData[tx.category] = (incomeData[tx.category] || 0) + tx.amount;
-        } else if (tx.type === 'expense') {
-          expenseData[tx.category] = (expenseData[tx.category] || 0) + tx.amount;
+        } else {
+          expenseData[tx.category] = (expenseData[tx.category] || 0) + Math.abs(tx.amount);
         }
       });
 
@@ -883,21 +751,16 @@
         }
       });
 
-      // Monthly Line Chart (Income and Expenses over months)
+      // Monthly Line Chart (aggregating transactions by month)
       const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
       if (monthlyChart) monthlyChart.destroy();
       const monthlyData = {};
       transactions.forEach(tx => {
         const d = new Date(tx.date);
         const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
-        if (!monthlyData[key]) {
-          monthlyData[key] = { income: 0, expense: 0 };
-        }
-        if (tx.type === 'income') {
-          monthlyData[key].income += tx.amount;
-        } else {
-          monthlyData[key].expense += tx.amount;
-        }
+        if (!monthlyData[key]) monthlyData[key] = { income: 0, expense: 0 };
+        if (tx.amount >= 0) monthlyData[key].income += tx.amount;
+        else monthlyData[key].expense += Math.abs(tx.amount);
       });
       const labels = Object.keys(monthlyData).sort();
       const incomeTotals = labels.map(label => monthlyData[label].income);
@@ -924,112 +787,67 @@
       });
     }
 
-    // Event Listeners
-    transactionType.addEventListener('change', function () {
-      if (this.value === 'income') {
-        incomeFields.classList.remove('hidden');
-        expenseFields.classList.add('hidden');
-        incomeCategory.setAttribute('required', '');
-        expenseCategory.removeAttribute('required');
-      } else if (this.value === 'expense') {
-        expenseFields.classList.remove('hidden');
-        incomeFields.classList.add('hidden');
-        expenseCategory.setAttribute('required', '');
-        incomeCategory.removeAttribute('required');
-      } else {
-        incomeFields.classList.add('hidden');
-        expenseFields.classList.add('hidden');
-        incomeCategory.removeAttribute('required');
-        expenseCategory.removeAttribute('required');
-      }
-    });
+    // ----- Event Listeners -----
 
-    editType.addEventListener('change', function () {
-      if (this.value === 'income') {
-        editIncomeFields.style.display = 'block';
-        editExpenseFields.style.display = 'none';
-      } else {
-        editIncomeFields.style.display = 'none';
-        editExpenseFields.style.display = 'block';
-      }
-    });
-
-    transactionForm.addEventListener('submit', function (e) {
+    // New Transaction Submission
+    transactionForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      let category;
-      if (transactionType.value === 'income') {
-        category = incomeCategory.value;
-      } else {
-        category = expenseCategory.value;
-      }
       const newTransaction = {
         id: generateId(),
-        type: transactionType.value,
-        category: category,
+        category: categoryInput.value,
         amount: parseFloat(amount.value),
         date: date.value,
-        description: description.value || (transactionType.value === 'income' ? 'Income' : 'Expense')
+        description: description.value || ''
       };
       transactions.push(newTransaction);
       saveTransactions();
       renderTransactions();
       updateSummary();
-      updateGoals();
+      updateCategoryList();
       renderCharts();
       transactionForm.reset();
       date.valueAsDate = new Date();
-      incomeFields.classList.add('hidden');
-      expenseFields.classList.add('hidden');
     });
 
     // Delete Transaction
-    confirmDelete.addEventListener('click', function () {
+    confirmDelete.addEventListener('click', function() {
       transactions = transactions.filter(tx => tx.id !== currentTransactionId);
       saveTransactions();
       renderTransactions();
       updateSummary();
-      updateGoals();
+      updateCategoryList();
       renderCharts();
       deleteModal.style.display = 'none';
     });
-
-    cancelDelete.addEventListener('click', function () {
+    cancelDelete.addEventListener('click', function() {
       deleteModal.style.display = 'none';
     });
 
     // Edit Transaction
-    editForm.addEventListener('submit', function (e) {
+    editForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      const txIndex = transactions.findIndex(tx => tx.id === currentTransactionId);
-      if (txIndex > -1) {
-        let category;
-        if (editType.value === 'income') {
-          category = editIncomeCategory.value;
-        } else {
-          category = editExpenseCategory.value;
-        }
-        transactions[txIndex] = {
+      const index = transactions.findIndex(tx => tx.id === currentTransactionId);
+      if (index > -1) {
+        transactions[index] = {
           id: currentTransactionId,
-          type: editType.value,
-          category: category,
+          category: editCategory.value,
           amount: parseFloat(editAmount.value),
           date: editDate.value,
-          description: editDescription.value || (editType.value === 'income' ? 'Income' : 'Expense')
+          description: editDescription.value || ''
         };
         saveTransactions();
         renderTransactions();
         updateSummary();
-        updateGoals();
+        updateCategoryList();
         renderCharts();
         editModal.style.display = 'none';
       }
     });
-
-    cancelEdit.addEventListener('click', function () {
+    cancelEdit.addEventListener('click', function() {
       editModal.style.display = 'none';
     });
 
-    // Tab switching
+    // Tab Switching
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const tabId = tab.getAttribute('data-tab');
@@ -1040,78 +858,142 @@
       });
     });
 
-    // Period select for analytics
-    periodSelect.addEventListener('change', function () {
+    // Analytics Period Selection
+    periodSelect.addEventListener('change', function() {
       if (this.value === 'custom') {
         customDateRange.classList.remove('hidden');
       } else {
         customDateRange.classList.add('hidden');
-        // Additional filtering logic can be added here
       }
     });
-
-    applyDateRange.addEventListener('click', function () {
-      // Custom range filtering can be implemented here; for now, we simply re-render charts.
+    applyDateRange.addEventListener('click', function() {
       renderCharts();
     });
 
-    // Set Income Goal
-    setIncomeGoal.addEventListener('click', function () {
+    // Set Goals
+    setIncomeGoal.addEventListener('click', function() {
       goals.incomeGoal = parseFloat(incomeGoalInput.value) || 0;
       saveTransactions();
-      updateGoals();
+      updateSummary();
     });
-
-    // Set Expense Budget
-    setExpenseBudget.addEventListener('click', function () {
+    setExpenseBudget.addEventListener('click', function() {
       goals.expenseBudget = parseFloat(expenseBudgetInput.value) || 0;
       saveTransactions();
-      updateGoals();
+      updateSummary();
     });
 
     // Export Data
-    exportBtn.addEventListener('click', function () {
-      const data = {
-        transactions,
-        goals
-      };
+    exportBtn.addEventListener('click', function() {
+      const data = { transactions, goals };
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "realtor_finance_data.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+      const anchor = document.createElement('a');
+      anchor.setAttribute("href", dataStr);
+      anchor.setAttribute("download", "realtor_finance_data.json");
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
     });
 
-    // Import Data
-    importBtn.addEventListener('click', function () {
+    // Import JSON Data
+    importBtn.addEventListener('click', function() {
       importFile.click();
     });
-
-    importFile.addEventListener('change', function (e) {
+    importFile.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function (e) {
+      reader.onload = function(e) {
         try {
           const importedData = JSON.parse(e.target.result);
-          transactions = importedData.transactions || [];
-          goals = importedData.goals || { incomeGoal: 0, expenseBudget: 0 };
+          if (importedData.transactions) {
+            transactions = transactions.concat(importedData.transactions);
+          }
+          if (importedData.goals) {
+            goals = importedData.goals;
+          }
           saveTransactions();
           renderTransactions();
           updateSummary();
-          updateGoals();
+          updateCategoryList();
           renderCharts();
         } catch (error) {
-          alert("Invalid file format.");
+          alert("Invalid JSON file format.");
         }
       };
       reader.readAsText(file);
     });
 
-    // Theme Toggle
-    darkModeToggle.addEventListener('change', function () {
+    // ----- PDF Import Logic -----
+    importPdfBtn.addEventListener('click', function() {
+      importPdfFile.click();
+    });
+    importPdfFile.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        processPdfBankStatement(arrayBuffer);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    // Process the PDF using PDF.js, extract text, and then parse transactions
+    function processPdfBankStatement(arrayBuffer) {
+      pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(pdf => {
+        const numPages = pdf.numPages;
+        let pagePromises = [];
+        for (let i = 1; i <= numPages; i++) {
+          pagePromises.push(
+            pdf.getPage(i).then(page => {
+              return page.getTextContent().then(textContent => {
+                return textContent.items.map(item => item.str).join(' ');
+              });
+            })
+          );
+        }
+        Promise.all(pagePromises).then(pagesText => {
+          const allText = pagesText.join('\n');
+          const newTx = parseBankStatementText(allText);
+          transactions = transactions.concat(newTx);
+          saveTransactions();
+          renderTransactions();
+          updateSummary();
+          updateCategoryList();
+          renderCharts();
+        });
+      }).catch(error => {
+        console.error("Error processing PDF:", error);
+        alert("Failed to process PDF bank statement.");
+      });
+    }
+
+    // Parse the extracted text from the PDF to find transaction lines.
+    // (This sample assumes each transaction line starts with a date in YYYY-MM-DD format, 
+    // then a description, then a type (e.g., Transfer, Deposit, etc.), and an amount.)
+    function parseBankStatementText(text) {
+      const transactionsFound = [];
+      const lines = text.split('\n');
+      // Example regex – adjust as needed for your bank's format.
+      const regex = /(\d{4}-\d{2}-\d{2})\s+(.+?)\s+(Transfer|Direct Debit|Deposit|Round Up Transfer|Purchase|Interest(?: Payment)?)\s+(-?\d+(?:\.\d+)?)/;
+      lines.forEach(line => {
+        const match = line.match(regex);
+        if (match) {
+          const [ , date, description, type, amountStr ] = match;
+          transactionsFound.push({
+            id: generateId(),
+            category: type,
+            date: date,
+            description: description,
+            amount: parseFloat(amountStr)
+          });
+        }
+      });
+      return transactionsFound;
+    }
+
+    // ----- Theme Toggle -----
+    darkModeToggle.addEventListener('change', function() {
       if (this.checked) {
         document.body.classList.add('dark-mode');
         themeLabel.textContent = "Light Mode";
@@ -1121,25 +1003,25 @@
       }
     });
 
-    // Initial load
+    // ----- Service Worker Registration -----
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // ----- Initial Load -----
     loadTransactions();
     renderTransactions();
     updateSummary();
-    updateGoals();
+    updateCategoryList();
     renderCharts();
   </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(registration => {
-          console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
-        });
-    });
-  }
-</script>
 </body>
 </html>
